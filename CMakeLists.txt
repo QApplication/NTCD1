@@ -1,0 +1,17 @@
+cmake_minimum_required(VERSION 3.5)
+
+project(DPT LANGUAGES CXX)
+
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+add_executable(NTSD1 main.cpp
+    # DataReader.h
+)
+
+include(GNUInstallDirs)
+
+install(TARGETS NTSD1
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+)
