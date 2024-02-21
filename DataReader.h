@@ -15,6 +15,8 @@
 #include <typeinfo>
 #include <optional>
 
+#include "Proc.h"
+
 
 template <typename Ty>
 class Data
@@ -32,10 +34,13 @@ public:
 
     Data(const std::string &absoluteFilePath);
     bool read();
+    void calc();
 
 private:
-    const std::filesystem::path mAbsoluteFilePath;
     std::vector<Ty> mData;
+    const std::filesystem::path mAbsoluteFilePath;
+    Processing<Ty> *mProc;
+
 
     bool exists() const;
 
@@ -101,20 +106,24 @@ void Data<Ty>::print_error() const
     if (eMsg.empty())
         return;
 
-    std::cout << "fix incorrect data in file: " << mAbsoluteFilePath.generic_string() << ".  " << std::endl;
+    std::cout << std::string(5, 0x20) << "File reading error:  " << mAbsoluteFilePath << std::endl;
+              // <<  "fix incorrect data in file: " << mAbsoluteFilePath.generic_string() << ".  " << ;
+
+
     for (auto const& v : eMsg) {
-        std::cout << "    row: "  << std::right << std::setw(5) << v.first << "     "
+        std::cout << std::string(10, 0x20) << "row: "  << std::right << std::setw(5) << v.first << "     "
                   << std::left << " error:" <<  error_str((ErrorData)v.second.first) << "     " << v.second.second
                   << " " << std::endl;
     }
-    std::cout << "Correct data and restart programm." << std::endl;
+    std::cout << std::endl << std::endl  << std::string(5, 0x20) << "Correct the Data and Restart the Programm !!!" << std::endl;
 }
 
 template<typename Ty>
 Data<Ty>::Data(const std::string &absoluteFilePath)
     : mAbsoluteFilePath(absoluteFilePath)
+    , mProc(new Processing<Ty>(mData))
 {
-    std::cout << "read of Data with type[" <<  typeid(Ty).hash_code() << "]: " << std::string(typeid(Ty).name()) << std::endl;
+    // std::cout << "read of Data with type[" <<  typeid(Ty).hash_code() << "]: " << std::string(typeid(Ty).name()) << std::endl;
 }
 
 template<typename Ty>
@@ -130,6 +139,12 @@ bool Data<Ty>::read()
 
     // parsing file
     return parser(_Out.cbegin(), _Out.cend());
+}
+
+template<typename Ty>
+void Data<Ty>::calc()
+{
+    mProc->run();
 }
 
 template<typename Ty>
