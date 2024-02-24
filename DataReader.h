@@ -4,7 +4,6 @@
 #include <iostream>
 #include <string>
 #include <filesystem>
-#include <iostream>
 #include <vector>
 #include <iterator>
 #include <fstream>
@@ -34,7 +33,7 @@ public:
 
     Data(const std::string &absoluteFilePath);
     bool read();
-    void calc();
+    void calc(const std::string &multiplicator, const std::string &logbase, const std::string &power, const std::string &average);
 
 private:
     std::vector<Ty> mData;
@@ -142,9 +141,61 @@ bool Data<Ty>::read()
 }
 
 template<typename Ty>
-void Data<Ty>::calc()
+void Data<Ty>::calc(const std::string &multiplicator, const std::string &logbase, const std::string &power, const std::string &average)
 {
-    mProc->run();
+    bool ok = true;
+    int row_count = 0;
+
+    Ty _multiplicator;
+    if (auto r = parser_type(multiplicator); r.has_value()) {    // check type pattern
+        eMsg[row_count] = r.value();
+        ++row_count;
+    }
+    if (auto r = stonum(_multiplicator, multiplicator); r.has_value()) {
+        eMsg[row_count] = r.value();
+        ++row_count;
+        ok = false;
+    }
+
+    Ty _logbase;
+    if (auto r = parser_type(logbase); r.has_value()) {    // check type pattern
+        eMsg[row_count] = r.value();
+        ++row_count;
+        ok = false;
+    }
+    if (auto r = stonum(_logbase, logbase); r.has_value()) {
+        eMsg[row_count] = r.value();
+        ++row_count;
+        ok = false;
+    }
+
+    Ty _power;
+    if (auto r = parser_type(power); r.has_value()) {    // check type pattern
+        eMsg[row_count] = r.value();
+        ++row_count;
+        ok = false;
+    }
+    if (auto r = stonum(_power, power); r.has_value()) {
+        eMsg[row_count] = r.value();
+        ++row_count;
+        ok = false;
+    }
+    size_t _average = 0ull;
+    try {
+        _average = std::stoull(average);
+    }
+    catch(std::invalid_argument const& ex) {
+        std::cout << typeid(*this).name() << "(" << this << ") average: invalid_argument" << std::endl;
+    }
+    catch(std::out_of_range const& ex) {
+        std::cout << typeid(*this).name() << "(" << this << ") average: out_of_range" << std::endl;
+    }
+
+    print_error();
+
+    if (eMsg.empty()) {
+        mProc->run(_multiplicator, _logbase, _power, _average);
+    }
 }
 
 template<typename Ty>
@@ -196,8 +247,6 @@ bool Data<Ty>::parser(std::basic_string<char>::const_iterator begin, std::basic_
     Ty _Data;
 
     while (std::regex_search(begin, end, sm, rx)) {
-
-        std::string s0 = sm[0], s1 = sm[1];
 
         // next row
         ++row_count;

@@ -28,18 +28,20 @@ public:
     Processing(const std::vector<T> &d);
     ~Processing();
 
-    void run();
+    void run(T multiplicator, T logbase, T power, size_t average);
     void print();
 
 private:
     const std::vector<T> &d;
 
     //
-    std::map<int,std::vector<T>*> out;
-    std::vector<double> log_out;
+    // std::map<int,std::vector<T>*> out;
+
+    std::vector<T> out_mul, out_pow, out_avr;
+    std::vector<double> out_log;
 
     void _mult(T value = static_cast<T>(2.0));
-    void _log();
+    void _log(T logbase = static_cast<T>(10.0));
     void _pow(T value = static_cast<T>(2.0));
     void _mean(size_t windwow = 10);
 
@@ -64,28 +66,25 @@ Processing<T>::Processing(const std::vector<T> &d)
 template<typename T>
 Processing<T>::~Processing()
 {
-    for (auto& _d : out) {
-        if (_d.second)
-            delete _d.second;
-    }
-    out.clear();
+
 }
 
 template<typename T>
-void Processing<T>::run()
+void Processing<T>::run(T multiplicator, T logbase, T power, size_t average)
 {
-    out[o_mult] = new std::vector<T>(d.size(), T());
-    // out[o_log]  = new std::vector<T>(d.size(), T());
-    log_out.resize(d.size(), 0.0);
-    out[o_pow]  = new std::vector<T>(d.size(), T());
-    out[o_mean] = new std::vector<T>(d.size(), T());
+    out_mul.resize(d.size(), static_cast<T>(0.0));
+    _mult(multiplicator);
 
-     _mult();
-     _log();
-     _pow();
-     _mean();
+    out_log.resize(d.size(), 0.0);
+    _log(logbase);
 
-     print();
+    out_pow.resize(d.size(), static_cast<T>(0.0));
+    _pow(power);
+
+    out_avr.resize(d.size(), static_cast<T>(0.0));
+    _mean(average);
+
+    print();
 }
 
 template<typename T>
@@ -118,13 +117,19 @@ void Processing<T>::print()
     for (size_t i = 0; i < d.size(); ++i) {
         std::cout << std::string(10, 0x20)
                   << std::right << std::setw(col_width) << std::fixed << std::setprecision(prec) << d.at(i)
-                  << std::right << std::setw(col_width) << std::fixed << std::setprecision(prec) << (*out[o_mult]).at(i);
-        std::isnan(log_out.at(i))
+                  << std::right << std::setw(col_width) << std::fixed << std::setprecision(prec) << out_mul.at(i);
+
+        std::isnan(out_log.at(i))
             ? std::cout << std::right << std::setw(col_width) << "NaN"
-            : std::cout << std::right << std::setw(col_width) << std::fixed << std::setprecision(log_prec) << log_out.at(i)
+            : std::cout << std::right << std::setw(col_width) << std::fixed << std::setprecision(log_prec) << out_log.at(i)
             ;
-        std::cout << std::right << std::setw(col_width) << std::fixed << std::setprecision(prec) << (*out[o_pow]).at(i)
-                  << std::right << std::setw(col_width) << std::fixed << std::setprecision(prec) << (*out[o_mean]).at(i)
+
+        std::isnan(out_pow.at(i))
+            ? std::cout << std::right << std::setw(col_width) << "NaN"
+            : std::cout << std::right << std::setw(col_width) << std::fixed << std::setprecision(prec) << out_pow.at(i)
+            ;
+
+        std::cout << std::right << std::setw(col_width) << std::fixed << std::setprecision(prec) << out_avr.at(i)
                   << std::endl;
     }
 }
@@ -133,45 +138,49 @@ template<typename T>
 void Processing<T>::_mult(T value)
 {
     for (size_t i = 0; i < d.size(); ++i) {
-        (*out[o_mult])[i] = value * d.at(i);
+        out_mul[i] = value * d.at(i);
     }
 }
 
 template<typename T>
-void Processing<T>::_log()
+void Processing<T>::_log(T logbase)
 {
-    const T t = static_cast<double>(0.0);        // bound
-    const T e = static_cast<double>(std::nan("exception"));
-
-
     for (size_t i = 0; i < d.size(); ++i) {
 
         // error handling
         errno = 0;
         std::feclearexcept(FE_ALL_EXCEPT);
 
-        double v = std::log(d.at(i));
+        if (double _D = std::log(logbase); errno == 0) {
 
-        log_out[i] = errno == 0
-                         ? v
-                         : std::nan("e")
-            ;
-
-
-        // (*out[o_log])[i] = d.at(i) > t
-        //                        ? std::log(d.at(i))
-        //                        : e
-        //     ;
-
-        // (*out[o_log])[i] = std::log(d.at(i));
+            double _N = std::log(d.at(i));
+            out_log[i] = (errno == 0)
+                             ? _N / _D
+                             : std::nan(std::to_string(errno).c_str())
+                ;
+        } else {
+            out_log[i] = std::nan("e");
+        }
     }
 }
 
 template<typename T>
 void Processing<T>::_pow(T value)
 {
+    std::feclearexcept(FE_ALL_EXCEPT);
+
     for (size_t i = 0; i < d.size(); ++i) {
-        (*out[o_pow])[i] = std::pow(d[i], value);
+
+        errno = 0;
+        auto b2 = std::pow(d[i], value);
+
+        if (errno == 0) {
+            out_pow[i] = b2;
+        } else {
+            // std::cout << b2 << "  " << d[i] << "  " << errno << "  " << std::strerror(errno) << std::endl;
+            out_pow[i] = std::nan(std::to_string(errno).c_str() );
+        }
+
     }
 }
 
@@ -182,9 +191,10 @@ void Processing<T>::_mean(size_t windwow)
 
     for (size_t i = 0; i < d.size(); ++i) {
 
-        (*out[o_mean])[i] = i < windwow
+        out_avr[i] = i < windwow
             ? static_cast<T>(0.0)
-                            : std::accumulate(std::prev(&d.at(i), windwow-1), &d.at(i), static_cast<T>(0.0), [] (T a, T b) { return std::move(a) + b; })
+                         : static_cast<T>((double)std::accumulate(std::prev(&d.at(i), windwow-1), &d.at(i), static_cast<T>(0.0), [] (T a, T b) { return std::move(a) + b; })
+                                          / (double)windwow)
             ;
     }
 }
