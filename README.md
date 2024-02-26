@@ -1,6 +1,11 @@
 # NTCD1
 Data processing task
-
+# Data types
+short, unsigned_short, int, unsigned_int, long, unsigned_long, long_long, unsigned_long_long, int16_t, uint16_t, int32_t, uint32_t, int64_t, uint64_t, float, double
+# Dataset (correct)
+data_float_c.txt, data_int_c.txt
+# Dataset (incorrect)
+data.txt
 # Build
 g++ main.cpp -O2 -std=c++2a -o run
 
