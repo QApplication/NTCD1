@@ -32,11 +32,13 @@ public:
     };
 
     Data(const std::string &absoluteFilePath);
+    ~Data();
     bool read();
-    void calc(const std::string &multiplicator, const std::string &logbase, const std::string &power, const std::string &average);
+    void calc(const std::basic_string<char> &result, const std::map<std::basic_string<char>,std::basic_string<char>> &params);
+
 
 private:
-    std::vector<Ty> mData;
+    std::vector<Ty> mData;      // input data
     const std::filesystem::path mAbsoluteFilePath;
     Processing<Ty> *mProc;
 
@@ -44,6 +46,8 @@ private:
     bool exists() const;
 
     bool read(std::basic_string<char> &_Out);
+    void calc(const std::basic_string<char> &result, const std::basic_string<char> &multiplicator, const std::basic_string<char> &logbase, const std::basic_string<char> &power, const std::basic_string<char> &average);
+    void write(const std::basic_string<char> &_Out);
 
     // parsers
     bool parser(std::basic_string<char>::const_iterator begin, std::basic_string<char>::const_iterator end);
@@ -126,6 +130,12 @@ Data<Ty>::Data(const std::string &absoluteFilePath)
 }
 
 template<typename Ty>
+Data<Ty>::~Data()
+{
+    delete mProc;
+}
+
+template<typename Ty>
 bool Data<Ty>::read()
 {
     if (!exists())
@@ -141,7 +151,13 @@ bool Data<Ty>::read()
 }
 
 template<typename Ty>
-void Data<Ty>::calc(const std::string &multiplicator, const std::string &logbase, const std::string &power, const std::string &average)
+void Data<Ty>::calc(const std::basic_string<char> &result, const std::map<std::basic_string<char>, std::basic_string<char>> &params)
+{
+    calc(result, params.at("multiplicator"), params.at("logbase"), params.at("power"), params.at("average"));
+}
+
+template<typename Ty>
+void Data<Ty>::calc(const std::basic_string<char> &result, const std::basic_string<char> &multiplicator, const std::basic_string<char> &logbase, const std::basic_string<char> &power, const std::basic_string<char> &average)
 {
     bool ok = true;
     int row_count = 0;
@@ -196,6 +212,71 @@ void Data<Ty>::calc(const std::string &multiplicator, const std::string &logbase
     if (eMsg.empty()) {
         mProc->run(_multiplicator, _logbase, _power, _average);
     }
+
+    // result write to file
+    write(result);
+}
+
+template<typename Ty>
+void Data<Ty>::write(const std::basic_string<char> &_Out)
+{
+    std::basic_ofstream<char> ostrm;
+    ostrm.open(std::filesystem::path(_Out));
+    if (!ostrm.is_open()) {
+        std::cout << "File do not open: " << _Out << std::endl;
+        return;
+    }
+
+
+    int col_width = 15;
+    int prec = 0;
+    int log_prec = 6;
+
+    if (std::is_same<Ty, float>::value) {
+        col_width += 5;
+        prec = 6;
+    }
+    if (std::is_same<Ty, double>::value) {
+        col_width += 10;
+        prec = 6;
+    }
+
+
+    // header
+    ostrm << std::string(10, 0x20)
+              << std::right << std::setw(col_width) << "Data"
+              << std::right << std::setw(col_width) << "Mult"
+              << std::right << std::setw(col_width) << "Log"
+              << std::right << std::setw(col_width) << "Pow"
+              << std::right << std::setw(col_width) << "Mean"
+              << std::endl << std::string(6*col_width, '=') << std::endl;
+
+    // data
+    for (size_t i = 0; i < mData.size(); ++i) {
+        ostrm << std::string(10, 0x20)
+                  << std::right << std::setw(col_width) << std::fixed << std::setprecision(prec) << mData.at(i)
+                  << std::right << std::setw(col_width) << std::fixed << std::setprecision(prec) << mProc->out_mul.at(i);
+
+        std::isnan(mProc->out_log.at(i))
+            ? ostrm << std::right << std::setw(col_width) << "NaN"
+            : ostrm << std::right << std::setw(col_width) << std::fixed << std::setprecision(log_prec) << mProc->out_log.at(i)
+            ;
+
+        std::isnan(mProc->out_pow.at(i))
+            ? ostrm << std::right << std::setw(col_width) << "NaN"
+            : ostrm << std::right << std::setw(col_width) << std::fixed << std::setprecision(prec) << mProc->out_pow.at(i)
+            ;
+
+        ostrm << std::right << std::setw(col_width) << std::fixed << std::setprecision(prec) << mProc->out_avr.at(i)
+                  << std::endl;
+    }
+
+
+    // if (!std::filesystem::exists(std::filesystem::path(data_out))) {
+    // std::cout << "out path "
+    // return;
+    // }
+
 }
 
 template<typename Ty>

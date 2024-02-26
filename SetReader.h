@@ -35,7 +35,7 @@ private:
     void print();
 
     // settings
-    std::map<std::string, std::map<std::string,std::string>> d;       // d[group][name] = value
+    std::map<std::basic_string<char>, std::map<std::basic_string<char>,std::basic_string<char>>> d;       // d[group][name] = value
 
     friend class FabricType;
 };
@@ -151,8 +151,13 @@ bool Settings::parser_l2(const std::basic_string<char> &f, const std::basic_stri
             example_settings();
             return false;
         }
-        if (!d["Data"].contains("data_path")) {
-            std::cerr << "\nInvalid Data param in setting file, see: \"data_path\"" << std::endl;
+        if (!d["Data"].contains("data_in")) {
+            std::cerr << "\nInvalid Data param in setting file, see: \"data_in\"" << std::endl;
+            example_settings();
+            return false;
+        }
+        if (!d["Data"].contains("data_out")) {
+            std::cerr << "\nInvalid Data param in setting file, see: \"data_out\"" << std::endl;
             example_settings();
             return false;
         }
@@ -224,7 +229,8 @@ void Settings::example_settings()
     std::cout << std::basic_string<char>(10,0x20) << "\nExample settings file content:" << std::endl;
     std::cout << std::basic_string<char>(15,0x20) << "[Data]" << std::endl
               << std::basic_string<char>(20,0x20) << "type=float" << std::endl
-              << std::basic_string<char>(20,0x20) << "data_path=/path-to-data-file/filename.txt" << std::endl
+              << std::basic_string<char>(20,0x20) << "data_in=/path-to-data-file/filename.txt" << std::endl
+              << std::basic_string<char>(20,0x20) << "data_out=/path-to-data-file/filename.txt" << std::endl
               << std::basic_string<char>(15,0x20) << "[Processing]" << std::endl
               << std::basic_string<char>(20,0x20) << "multiplicator=2.0" << std::endl
               << std::basic_string<char>(20,0x20) << "logbase=10" << std::endl
@@ -238,7 +244,8 @@ void Settings::print()
     std::cout << std::basic_string<char>(10,0x20) << "\nCurrent settings:" << std::endl;
     std::cout << std::basic_string<char>(15,0x20) << "[Data]" << std::endl
               << std::basic_string<char>(20,0x20) << "type=" << d.at("Data").at("type") << std::endl
-              << std::basic_string<char>(20,0x20) << "data_path=" << d.at("Data").at("data_path") << std::endl
+              << std::basic_string<char>(20,0x20) << "data_in=" << d.at("Data").at("data_in") << std::endl
+              << std::basic_string<char>(20,0x20) << "data_out=" << d.at("Data").at("data_out") << std::endl
               << std::basic_string<char>(15,0x20) << "[Processing]" << std::endl
               << std::basic_string<char>(20,0x20) << "multiplicator=" << d.at("Processing").at("multiplicator") << std::endl
               << std::basic_string<char>(20,0x20) << "logbase=" << d.at("Processing").at("logbase") << std::endl

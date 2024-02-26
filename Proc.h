@@ -33,10 +33,6 @@ public:
 
 private:
     const std::vector<T> &d;
-
-    //
-    // std::map<int,std::vector<T>*> out;
-
     std::vector<T> out_mul, out_pow, out_avr;
     std::vector<double> out_log;
 
@@ -45,13 +41,13 @@ private:
     void _pow(T value = static_cast<T>(2.0));
     void _mean(size_t windwow = 10);
 
-
-
     Processing() = delete;
     Processing(const Processing&) = delete;
     Processing &operator=(const Processing&) = delete;
     Processing(const Processing&&) = delete;
     Processing &operator=(const Processing&&) = delete;
+
+    template<typename Ty> friend class Data;
 };
 
 

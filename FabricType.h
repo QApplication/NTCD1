@@ -67,138 +67,141 @@ void FabricType::run()
         return;
 
     auto type_name = mSetting.d["Data"]["type"];
-    auto data_path = mSetting.d["Data"]["data_path"];
+    std::basic_string<char> data_in   = mSetting.d["Data"]["data_in"];
+    std::basic_string<char> data_out  = mSetting.d["Data"]["data_out"];
 
     std::cout << "\n" << typeid(*this).name() << "(" << this << ", " << type_name << ")" << "  running ... "<< std::string(50, '+') <<  "\n\n";
 
+
     if (!check_type(type_name))
         return;
+
 
     mSetting.print();
 
     switch (mTypes.at(mType)) {
 
     case it_short: {
-        Data<short> d(data_path);
+        Data<short> d(data_in);
         if (d.read())
-            d.calc(mSetting.d["Processing"]["multiplicator"], mSetting.d["Processing"]["logbase"], mSetting.d["Processing"]["power"], mSetting.d["Processing"]["average"]);
+            d.calc(data_out, mSetting.d["Processing"]);
     }
     break;
     case it_unsigned_short:
     {
-        Data<unsigned short> d(data_path);
+        Data<unsigned short> d(data_in);
         if (d.read())
-            d.calc(mSetting.d["Processing"]["multiplicator"], mSetting.d["Processing"]["logbase"], mSetting.d["Processing"]["power"], mSetting.d["Processing"]["average"]);
+            d.calc(data_out, mSetting.d["Processing"]);
     }
     break;
 
     case it_int:
     {
-        Data<int> d(data_path);
+        Data<int> d(data_in);
         if (d.read())
-            d.calc(mSetting.d["Processing"]["multiplicator"], mSetting.d["Processing"]["logbase"], mSetting.d["Processing"]["power"], mSetting.d["Processing"]["average"]);
+            d.calc(data_out, mSetting.d["Processing"]);
     }
     break;
     case it_unsigned_int:
     {
-        Data<unsigned int> d(data_path);
+        Data<unsigned int> d(data_in);
         if (d.read())
-            d.calc(mSetting.d["Processing"]["multiplicator"], mSetting.d["Processing"]["logbase"], mSetting.d["Processing"]["power"], mSetting.d["Processing"]["average"]);
+            d.calc(data_out, mSetting.d["Processing"]);
     }
     break;
 
 
     case it_long:
     {
-        Data<long> d(data_path);
+        Data<long> d(data_in);
         if (d.read())
-            d.calc(mSetting.d["Processing"]["multiplicator"], mSetting.d["Processing"]["logbase"], mSetting.d["Processing"]["power"], mSetting.d["Processing"]["average"]);
+            d.calc(data_out, mSetting.d["Processing"]);
     }
     break;
     case it_unsigned_long:
     {
-        Data<unsigned long> d(data_path);
+        Data<unsigned long> d(data_in);
         if (d.read())
-            d.calc(mSetting.d["Processing"]["multiplicator"], mSetting.d["Processing"]["logbase"], mSetting.d["Processing"]["power"], mSetting.d["Processing"]["average"]);
+            d.calc(data_out, mSetting.d["Processing"]);
     }
     break;
 
     case it_long_long:
     {
-        Data<long long> d(data_path);
+        Data<long long> d(data_in);
         if (d.read())
-            d.calc(mSetting.d["Processing"]["multiplicator"], mSetting.d["Processing"]["logbase"], mSetting.d["Processing"]["power"], mSetting.d["Processing"]["average"]);
+            d.calc(data_out, mSetting.d["Processing"]);
     }
     break;
     case it_unsigned_long_long:
     {
-        Data<unsigned long long> d(data_path);
+        Data<unsigned long long> d(data_in);
         if (d.read())
-            d.calc(mSetting.d["Processing"]["multiplicator"], mSetting.d["Processing"]["logbase"], mSetting.d["Processing"]["power"], mSetting.d["Processing"]["average"]);
+            d.calc(data_out, mSetting.d["Processing"]);
     }
     break;
 
 
     case it_int16_t:
     {
-        Data<int16_t> d(data_path);
+        Data<int16_t> d(data_in);
         if (d.read())
-            d.calc(mSetting.d["Processing"]["multiplicator"], mSetting.d["Processing"]["logbase"], mSetting.d["Processing"]["power"], mSetting.d["Processing"]["average"]);
+            d.calc(data_out, mSetting.d["Processing"]);
     }
     break;
     case it_uint16_t:
     {
-        Data<uint16_t> d(data_path);
+        Data<uint16_t> d(data_in);
         if (d.read())
-            d.calc(mSetting.d["Processing"]["multiplicator"], mSetting.d["Processing"]["logbase"], mSetting.d["Processing"]["power"], mSetting.d["Processing"]["average"]);
+            d.calc(data_out, mSetting.d["Processing"]);
     }
     break;
 
 
     case it_int32_t:
     {
-        Data<int32_t> d(data_path);
+        Data<int32_t> d(data_in);
         if (d.read())
-            d.calc(mSetting.d["Processing"]["multiplicator"], mSetting.d["Processing"]["logbase"], mSetting.d["Processing"]["power"], mSetting.d["Processing"]["average"]);
+            d.calc(data_out, mSetting.d["Processing"]);
     }
     break;
     case it_uint32_t:
     {
-        Data<uint32_t> d(data_path);
+        Data<uint32_t> d(data_in);
         if (d.read())
-            d.calc(mSetting.d["Processing"]["multiplicator"], mSetting.d["Processing"]["logbase"], mSetting.d["Processing"]["power"], mSetting.d["Processing"]["average"]);
+            d.calc(data_out, mSetting.d["Processing"]);
     }
     break;
 
 
     case it_int64_t:
     {
-        Data<int64_t> d(data_path);
+        Data<int64_t> d(data_in);
         if (d.read())
-            d.calc(mSetting.d["Processing"]["multiplicator"], mSetting.d["Processing"]["logbase"], mSetting.d["Processing"]["power"], mSetting.d["Processing"]["average"]);
+            d.calc(data_out, mSetting.d["Processing"]);
     }
     break;
     case it_uint64_t:
     {
-        Data<uint64_t> d(data_path);
+        Data<uint64_t> d(data_in);
         if (d.read())
-            d.calc(mSetting.d["Processing"]["multiplicator"], mSetting.d["Processing"]["logbase"], mSetting.d["Processing"]["power"], mSetting.d["Processing"]["average"]);
+            d.calc(data_out, mSetting.d["Processing"]);
     }
     break;
 
 
     case it_float:
     {
-        Data<float> d(data_path);
+        Data<float> d(data_in);
         if (d.read())
-            d.calc(mSetting.d["Processing"]["multiplicator"], mSetting.d["Processing"]["logbase"], mSetting.d["Processing"]["power"], mSetting.d["Processing"]["average"]);
+            d.calc(data_out, mSetting.d["Processing"]);
     }
     break;
     case it_double:
     {
-        Data<double> d(data_path);
+        Data<double> d(data_in);
         if (d.read())
-            d.calc(mSetting.d["Processing"]["multiplicator"], mSetting.d["Processing"]["logbase"], mSetting.d["Processing"]["power"], mSetting.d["Processing"]["average"]);
+            d.calc(data_out, mSetting.d["Processing"]);
     }
     break;
 
